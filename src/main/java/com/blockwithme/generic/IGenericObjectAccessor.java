@@ -188,6 +188,7 @@ public interface IGenericObjectAccessor<STORAGE> {
      * if boolean values do not have their own ID space.
      *
      * @return True, if this implementation use "optimal packing" for boolean values.
+     * @throws UnsupportedOperationException If boolean values do not have their own ID space.
      *
      * @see #isBooleanValuesIDSpaceIndependentFromPrimitive()
      */
@@ -766,4 +767,34 @@ public interface IGenericObjectAccessor<STORAGE> {
      * @throws RuntimeException The API is expected to throw *some* RuntimeException if index is invalid.
      */
     STORAGE setDoubleValue(STORAGE instance, int index, double value);
+
+    //////////////////////////////////////////////////////////////////////////
+
+    /**
+     * Returns a Object value at the given index.
+     *
+     * @param instance The generic object storage instance.
+     * @param index The index of the desired value.
+     * @return The desired value.
+     *
+     * @throws RuntimeException The API is expected to throw *some* RuntimeException if instance is invalid (null, or wrong type)
+     * @throws RuntimeException The API is expected to throw *some* RuntimeException if index is invalid.
+     */
+    Object getObjectValue(STORAGE instance, int index);
+
+    /**
+     * Sets a Object value at the given index.
+     *
+     * The return value of this call should always be used to replace the
+     * instance passed as parameter.
+     *
+     * @param instance The generic object storage instance.
+     * @param index The index of the desired value.
+     * @param value The desired new value.
+     * @return The new replacement, or modified, generic object storage instance.
+     *
+     * @throws RuntimeException The API is expected to throw *some* RuntimeException if instance is invalid (null, or wrong type)
+     * @throws RuntimeException The API is expected to throw *some* RuntimeException if index is invalid.
+     */
+    STORAGE setObjectValue(STORAGE instance, int index, Object value);
 }

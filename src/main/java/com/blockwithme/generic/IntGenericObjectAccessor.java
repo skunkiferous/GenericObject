@@ -16,82 +16,103 @@
 package com.blockwithme.generic;
 
 /**
- * DoubleFixedBooleanGenericObjectAccessor implements IGenericObjectAccessor using doubles.
- * Booleans are fixed to 52. Instances are not immutable/thread-safe.
- * Using longs require a native call, and so goes slower.
+ * IntGenericObjectAccessor implements IGenericObjectAccessor using ints.
+ * Booleans are stored as normal primitives. Instances are not immutable/thread-safe.
+ * Using float and doubles require a native call, and so goes slower.
  *
  * @see IGenericObjectAccessor for more documentation.
  *
  * @author monster
  */
-public class DoubleFixedBooleanGenericObjectAccessor implements
+public class IntGenericObjectAccessor implements
         IGenericObjectAccessor<Object[]> {
-    /** Initial index (not boolean). */
-    private static final int START_INDEX = 1;
-    /** Minimum size (not boolean) */
-    private static final int MIN_SIZE = 8 + 1 /* +1 either for double[] or booleans) */;
-    /** Maximum size (not boolean) */
-    private static final int MAX_SIZE = Integer.MAX_VALUE - 1;
-    /** Initial boolean index. */
-    private static final int START_BOOLEAN_INDEX = 0;
-    /**
-     * Maximum boolean size; we can only safely access 52 bits of a double,
-     * *without using native calls*.
-     */
-    private static final int MAX_BOOLEAN_SIZE = 52;
+    /** Primitive Initial index. */
+    private static final int PRIMITIVE_START_INDEX = 0;
+    /** Primitive Minimum size */
+    private static final int PRIMITIVE_MIN_SIZE = 8;
+    /** Primitive Maximum size */
+    private static final int PRIMITIVE_MAX_SIZE = Integer.MAX_VALUE;
+    /** Object Initial index. */
+    private static final int OBJECT_START_INDEX = 1;
+    /** Object Minimum size */
+    private static final int OBJECT_MIN_SIZE = 8 + 1 /* +1 for int[]) */;
+    /** Object Maximum size */
+    private static final int OBJECT_MAX_SIZE = Integer.MAX_VALUE - 1;
 
     //////////////////////////////////////////////////////////////////////////
 
     /**
-     * Validates the non-boolean index.
+     * Validates the primitive index.
      *
-     * @param index The non-boolean index
+     * @param index The primitive index
      */
-    private static void checkNonBooleanIndex(final int index) {
-        if ((index < START_INDEX) || (index >= MAX_SIZE)) {
+    private static void checkPrimitiveIndex(final int index) {
+        if ((index < PRIMITIVE_START_INDEX) || (index >= PRIMITIVE_MAX_SIZE)) {
             throw new IllegalArgumentException("index: " + index
-                    + " must be withing [" + START_INDEX + ", "
-                    + (MAX_SIZE - 1) + "]");
+                    + " must be withing [" + PRIMITIVE_START_INDEX + ", "
+                    + (PRIMITIVE_MAX_SIZE - 1) + "]");
         }
     }
 
     /**
-     * Validates the boolean index.
+     * Validates the Object index.
      *
-     * @param index The boolean index
+     * @param index The Object index
      */
-    private static void checkBooleanIndex(final int index) {
-        if ((index < START_BOOLEAN_INDEX) || (index >= MAX_BOOLEAN_SIZE)) {
+    private static void checkObjectIndex(final int index) {
+        if ((index < OBJECT_START_INDEX) || (index >= OBJECT_MAX_SIZE)) {
             throw new IllegalArgumentException("index: " + index
-                    + " must be withing [" + START_BOOLEAN_INDEX + ", "
-                    + (MAX_BOOLEAN_SIZE - 1) + "]");
+                    + " must be withing [" + OBJECT_START_INDEX + ", "
+                    + (OBJECT_MAX_SIZE - 1) + "]");
         }
     }
 
-    /** Computes a "new size" */
-    private static int newSize(final int reservedSize, final String name) {
-        if ((reservedSize < 0) || (reservedSize > MAX_SIZE)) {
+    /** Computes a "new size" for primitive values */
+    private static int newPrimitiveSize(final int reservedSize,
+            final String name) {
+        if ((reservedSize < 0) || (reservedSize > PRIMITIVE_MAX_SIZE)) {
             throw new IllegalArgumentException(name + ": " + reservedSize);
         }
         final int newSize;
-        if (reservedSize > (MIN_SIZE - START_INDEX)) {
+        if (reservedSize > (PRIMITIVE_MIN_SIZE - PRIMITIVE_START_INDEX)) {
             final int powerOfTwo = 32 - Integer
                     .numberOfLeadingZeros(reservedSize - 1);
             if (powerOfTwo == 31) {
                 // Cannot represent (1 << 31) correctly
                 newSize = Integer.MAX_VALUE;
             } else {
-                newSize = (1 << powerOfTwo) + 1 /* For booleans */;
+                newSize = (1 << powerOfTwo);
             }
         } else {
-            newSize = MIN_SIZE;
+            newSize = PRIMITIVE_MIN_SIZE;
+        }
+        return newSize;
+    }
+
+    /** Computes a "new size" for Objects */
+    private static int newObjectSize(final int reservedSize, final String name) {
+        if ((reservedSize < 0) || (reservedSize > OBJECT_MAX_SIZE)) {
+            throw new IllegalArgumentException(name + ": " + reservedSize);
+        }
+        final int newSize;
+        if (reservedSize > (OBJECT_MIN_SIZE - OBJECT_START_INDEX)) {
+            final int powerOfTwo = 32 - Integer
+                    .numberOfLeadingZeros(reservedSize - 1);
+            if (powerOfTwo == 31) {
+                // Cannot represent (1 << 31) correctly
+                newSize = Integer.MAX_VALUE;
+            } else {
+                newSize = (1 << powerOfTwo) + 1 /* For int[] */;
+            }
+        } else {
+            newSize = OBJECT_MIN_SIZE;
         }
         return newSize;
     }
 
     /** Returns the primitive array */
-    private static double[] getPrimitiveArray(final Object[] instance) {
-        return (double[]) instance[0];
+    private static int[] getPrimitiveArray(final Object[] instance) {
+        return (int[]) instance[0];
     }
 
     //////////////////////////////////////////////////////////////////////////
@@ -100,14 +121,14 @@ public class DoubleFixedBooleanGenericObjectAccessor implements
      * @see IGenericObjectAccessor#isBooleanValuesIDSpaceIndependentFromPrimitive()
      */
     public static boolean _isBooleanValuesIDSpaceIndependentFromPrimitive() {
-        return true;
+        return false;
     }
 
     /**
      * @see IGenericObjectAccessor#isBooleanValuesIDSpaceFixed()
      */
     public static boolean _isBooleanValuesIDSpaceFixed() {
-        return true;
+        return false;
     }
 
     /**
@@ -121,7 +142,7 @@ public class DoubleFixedBooleanGenericObjectAccessor implements
      * @see IGenericObjectAccessor#getBooleanValuesIDSpaceFixedSize()
      */
     public static int _getBooleanValuesIDSpaceFixedSize() {
-        return MAX_BOOLEAN_SIZE;
+        return -1;
     }
 
     /**
@@ -142,14 +163,14 @@ public class DoubleFixedBooleanGenericObjectAccessor implements
      * @see IGenericObjectAccessor#isLongUsingTwoPrimitiveSlots()
      */
     public static boolean _isLongUsingTwoPrimitiveSlots() {
-        return false;
+        return true;
     }
 
     /**
      * @see IGenericObjectAccessor#isDoubleUsingTwoPrimitiveSlots()
      */
     public static boolean _isDoubleUsingTwoPrimitiveSlots() {
-        return false;
+        return true;
     }
 
     //////////////////////////////////////////////////////////////////////////
@@ -166,8 +187,8 @@ public class DoubleFixedBooleanGenericObjectAccessor implements
      */
     public static boolean _isOptimalPackingUsedForBooleanValues()
             throws UnsupportedOperationException {
-        // Fixed-size means NOT optimal
-        return false;
+        throw new UnsupportedOperationException(
+                "Boolean do not have their own ID space");
     }
 
     /**
@@ -183,7 +204,7 @@ public class DoubleFixedBooleanGenericObjectAccessor implements
      * @see IGenericObjectAccessor#getPrimitiveValuesStartIndex()
      */
     public static int _getPrimitiveValuesStartIndex() {
-        return START_INDEX;
+        return PRIMITIVE_START_INDEX;
     }
 
     /**
@@ -191,14 +212,15 @@ public class DoubleFixedBooleanGenericObjectAccessor implements
      */
     public static int _getBooleanValuesStartIndex()
             throws UnsupportedOperationException {
-        return START_BOOLEAN_INDEX;
+        throw new UnsupportedOperationException(
+                "Boolean do not have their own ID space");
     }
 
     /**
      * @see IGenericObjectAccessor#getObjectValuesStartIndex()
      */
     public static int _getObjectValuesStartIndex() {
-        return START_INDEX;
+        return OBJECT_START_INDEX;
     }
 
     //////////////////////////////////////////////////////////////////////////
@@ -207,7 +229,7 @@ public class DoubleFixedBooleanGenericObjectAccessor implements
      * @see IGenericObjectAccessor#getPrimitiveValuesMaximumCount()
      */
     public static int _getPrimitiveValuesMaximumCount() {
-        return MAX_SIZE;
+        return PRIMITIVE_MAX_SIZE;
     }
 
     /**
@@ -215,14 +237,15 @@ public class DoubleFixedBooleanGenericObjectAccessor implements
      */
     public static int _getBooleanValuesMaximumCount()
             throws UnsupportedOperationException {
-        return MAX_BOOLEAN_SIZE;
+        throw new UnsupportedOperationException(
+                "Boolean do not have their own ID space");
     }
 
     /**
      * @see IGenericObjectAccessor#getObjectValuesMaximumCount()
      */
     public static int _getObjectValuesMaximumCount() {
-        return MAX_SIZE;
+        return OBJECT_MAX_SIZE;
     }
 
     //////////////////////////////////////////////////////////////////////////
@@ -231,8 +254,8 @@ public class DoubleFixedBooleanGenericObjectAccessor implements
      * @see IGenericObjectAccessor#newEmptyGenericObject()
      */
     public static Object[] _newEmptyGenericObject() {
-        final Object[] result = new Object[MIN_SIZE];
-        result[0] = new double[MIN_SIZE];
+        final Object[] result = new Object[OBJECT_MIN_SIZE];
+        result[0] = new int[PRIMITIVE_MIN_SIZE];
         return result;
     }
 
@@ -242,7 +265,8 @@ public class DoubleFixedBooleanGenericObjectAccessor implements
     public static Object[] _newGenericObject(final int requiredPrimitiveSlots,
             final int requiredBooleanSlots, final int requiredObjectSlots)
             throws UnsupportedOperationException {
-        throw new UnsupportedOperationException("Boolean ID Space is fixed");
+        throw new UnsupportedOperationException(
+                "Boolean do not have their own ID space");
     }
 
     /**
@@ -250,12 +274,12 @@ public class DoubleFixedBooleanGenericObjectAccessor implements
      */
     public static Object[] _newGenericObject(final int requiredPrimitiveSlots,
             final int requiredObjectSlots) {
-        final int newPrimitiveSize = newSize(requiredPrimitiveSlots,
+        final int newPrimitiveSize = newPrimitiveSize(requiredPrimitiveSlots,
                 "requiredPrimitiveSlots");
-        final int newObjectSize = newSize(requiredObjectSlots,
+        final int newObjectSize = newObjectSize(requiredObjectSlots,
                 "requiredObjectSlots");
         final Object[] result = new Object[newObjectSize];
-        result[0] = new double[newPrimitiveSize];
+        result[0] = new int[newPrimitiveSize];
         return result;
     }
 
@@ -265,7 +289,7 @@ public class DoubleFixedBooleanGenericObjectAccessor implements
      * @see IGenericObjectAccessor#getPrimitiveValuesMaximumIndex(Object)
      */
     public static int _getPrimitiveValuesMaximumIndex(final Object[] instance) {
-        return getPrimitiveArray(instance).length - (1 + START_INDEX);
+        return getPrimitiveArray(instance).length - (1 + PRIMITIVE_START_INDEX);
     }
 
     /**
@@ -273,14 +297,15 @@ public class DoubleFixedBooleanGenericObjectAccessor implements
      */
     public static int _getBooleanValuesMaximumIndex(final Object[] instance)
             throws UnsupportedOperationException {
-        return MAX_BOOLEAN_SIZE - (1 + START_BOOLEAN_INDEX);
+        throw new UnsupportedOperationException(
+                "Boolean do not have their own ID space");
     }
 
     /**
      * @see IGenericObjectAccessor#getObjectValuesMaximumIndex(Object)
      */
     public static int _getObjectValuesMaximumIndex(final Object[] instance) {
-        return instance.length - (1 + START_INDEX);
+        return instance.length - (1 + OBJECT_START_INDEX);
     }
 
     //////////////////////////////////////////////////////////////////////////
@@ -289,7 +314,7 @@ public class DoubleFixedBooleanGenericObjectAccessor implements
      * @see IGenericObjectAccessor#getPrimitiveValuesSlotsAvailable(Object)
      */
     public static int _getPrimitiveValuesSlotsAvailable(final Object[] instance) {
-        return getPrimitiveArray(instance).length - START_INDEX;
+        return getPrimitiveArray(instance).length - PRIMITIVE_START_INDEX;
     }
 
     /**
@@ -297,14 +322,15 @@ public class DoubleFixedBooleanGenericObjectAccessor implements
      */
     public static int _getBooleanValuesSlotsAvailable(final Object[] instance)
             throws UnsupportedOperationException {
-        return MAX_BOOLEAN_SIZE - START_BOOLEAN_INDEX;
+        throw new UnsupportedOperationException(
+                "Boolean do not have their own ID space");
     }
 
     /**
      * @see IGenericObjectAccessor#getObjectValuesSlotsAvailable(Object)
      */
     public static int _getObjectValuesSlotsAvailable(final Object[] instance) {
-        return instance.length - START_INDEX;
+        return instance.length - OBJECT_START_INDEX;
     }
 
     //////////////////////////////////////////////////////////////////////////
@@ -343,11 +369,11 @@ public class DoubleFixedBooleanGenericObjectAccessor implements
      */
     public static Object[] _resizePrimitiveValues(final Object[] instance,
             final int reservedSize) {
-        final double[] oldData = getPrimitiveArray(instance);
+        final int[] oldData = getPrimitiveArray(instance);
         final int oldSize = oldData.length;
-        final int newSize = newSize(reservedSize, "reservedSize");
+        final int newSize = newPrimitiveSize(reservedSize, "reservedSize");
         if (oldSize < newSize) {
-            final double[] newData = new double[newSize];
+            final int[] newData = new int[newSize];
             System.arraycopy(oldData, 0, newData, 0, oldSize);
             instance[0] = newData;
         }
@@ -359,7 +385,8 @@ public class DoubleFixedBooleanGenericObjectAccessor implements
      */
     public static Object[] _resizeBooleanValues(final Object[] instance,
             final int reservedSize) throws UnsupportedOperationException {
-        throw new UnsupportedOperationException("Boolean ID Space is fixed");
+        throw new UnsupportedOperationException(
+                "Boolean do not have their own ID space");
     }
 
     /**
@@ -369,7 +396,7 @@ public class DoubleFixedBooleanGenericObjectAccessor implements
             final int reservedSize) {
         final Object[] oldData = instance;
         final int oldSize = oldData.length;
-        final int newSize = newSize(reservedSize, "reservedSize");
+        final int newSize = newObjectSize(reservedSize, "reservedSize");
         if (oldSize < newSize) {
             final Object[] newData = new Object[newSize];
             System.arraycopy(oldData, 0, newData, 0, oldSize);
@@ -385,9 +412,8 @@ public class DoubleFixedBooleanGenericObjectAccessor implements
      */
     public static boolean _getBooleanValue(final Object[] instance,
             final int index) {
-        checkBooleanIndex(index);
-        final long booleans = (long) getPrimitiveArray(instance)[0];
-        return (booleans & (1L << index)) != 0;
+        checkPrimitiveIndex(index);
+        return getPrimitiveArray(instance)[index + PRIMITIVE_START_INDEX] != 0;
     }
 
     /**
@@ -395,14 +421,9 @@ public class DoubleFixedBooleanGenericObjectAccessor implements
      */
     public static Object[] _setBooleanValue(final Object[] instance,
             final int index, final boolean value) {
-        checkBooleanIndex(index);
-        final double[] doubles = getPrimitiveArray(instance);
-        final long booleans = (long) doubles[0];
-        if (value) {
-            doubles[0] = booleans | (1L << index);
-        } else {
-            doubles[0] = booleans & ~(1L << index);
-        }
+        checkPrimitiveIndex(index);
+        getPrimitiveArray(instance)[index + PRIMITIVE_START_INDEX] = value ? 1
+                : 0;
         return instance;
     }
 
@@ -412,8 +433,8 @@ public class DoubleFixedBooleanGenericObjectAccessor implements
      * @see IGenericObjectAccessor#getByteValue(Object, int)
      */
     public static byte _getByteValue(final Object[] instance, final int index) {
-        checkNonBooleanIndex(index);
-        return (byte) getPrimitiveArray(instance)[index + START_INDEX];
+        checkPrimitiveIndex(index);
+        return (byte) getPrimitiveArray(instance)[index + PRIMITIVE_START_INDEX];
     }
 
     /**
@@ -421,8 +442,8 @@ public class DoubleFixedBooleanGenericObjectAccessor implements
      */
     public static Object[] _setByteValue(final Object[] instance,
             final int index, final byte value) {
-        checkNonBooleanIndex(index);
-        getPrimitiveArray(instance)[index + START_INDEX] = value;
+        checkPrimitiveIndex(index);
+        getPrimitiveArray(instance)[index + PRIMITIVE_START_INDEX] = value;
         return instance;
     }
 
@@ -432,8 +453,8 @@ public class DoubleFixedBooleanGenericObjectAccessor implements
      * @see IGenericObjectAccessor#getCharValue(Object, int)
      */
     public static char _getCharValue(final Object[] instance, final int index) {
-        checkNonBooleanIndex(index);
-        return (char) getPrimitiveArray(instance)[index + START_INDEX];
+        checkPrimitiveIndex(index);
+        return (char) getPrimitiveArray(instance)[index + PRIMITIVE_START_INDEX];
     }
 
     /**
@@ -441,8 +462,8 @@ public class DoubleFixedBooleanGenericObjectAccessor implements
      */
     public static Object[] _setCharValue(final Object[] instance,
             final int index, final char value) {
-        checkNonBooleanIndex(index);
-        getPrimitiveArray(instance)[index + START_INDEX] = value;
+        checkPrimitiveIndex(index);
+        getPrimitiveArray(instance)[index + PRIMITIVE_START_INDEX] = value;
         return instance;
     }
 
@@ -452,8 +473,9 @@ public class DoubleFixedBooleanGenericObjectAccessor implements
      * @see IGenericObjectAccessor#getShortValue(Object, int)
      */
     public static short _getShortValue(final Object[] instance, final int index) {
-        checkNonBooleanIndex(index);
-        return (short) getPrimitiveArray(instance)[index + START_INDEX];
+        checkPrimitiveIndex(index);
+        return (short) getPrimitiveArray(instance)[index
+                + PRIMITIVE_START_INDEX];
     }
 
     /**
@@ -461,8 +483,8 @@ public class DoubleFixedBooleanGenericObjectAccessor implements
      */
     public static Object[] _setShortValue(final Object[] instance,
             final int index, final short value) {
-        checkNonBooleanIndex(index);
-        getPrimitiveArray(instance)[index + START_INDEX] = value;
+        checkPrimitiveIndex(index);
+        getPrimitiveArray(instance)[index + PRIMITIVE_START_INDEX] = value;
         return instance;
     }
 
@@ -472,8 +494,8 @@ public class DoubleFixedBooleanGenericObjectAccessor implements
      * @see IGenericObjectAccessor#getIntValue(Object, int)
      */
     public static int _getIntValue(final Object[] instance, final int index) {
-        checkNonBooleanIndex(index);
-        return (int) getPrimitiveArray(instance)[index + START_INDEX];
+        checkPrimitiveIndex(index);
+        return getPrimitiveArray(instance)[index + PRIMITIVE_START_INDEX];
     }
 
     /**
@@ -481,8 +503,8 @@ public class DoubleFixedBooleanGenericObjectAccessor implements
      */
     public static Object[] _setIntValue(final Object[] instance,
             final int index, final int value) {
-        checkNonBooleanIndex(index);
-        getPrimitiveArray(instance)[index + START_INDEX] = value;
+        checkPrimitiveIndex(index);
+        getPrimitiveArray(instance)[index + PRIMITIVE_START_INDEX] = value;
         return instance;
     }
 
@@ -492,8 +514,7 @@ public class DoubleFixedBooleanGenericObjectAccessor implements
      * @see IGenericObjectAccessor#getFloatValue(Object, int)
      */
     public static float _getFloatValue(final Object[] instance, final int index) {
-        checkNonBooleanIndex(index);
-        return (float) getPrimitiveArray(instance)[index + START_INDEX];
+        return Float.intBitsToFloat(_getIntValue(instance, index));
     }
 
     /**
@@ -501,9 +522,7 @@ public class DoubleFixedBooleanGenericObjectAccessor implements
      */
     public static Object[] _setFloatValue(final Object[] instance,
             final int index, final float value) {
-        checkNonBooleanIndex(index);
-        getPrimitiveArray(instance)[index + START_INDEX] = value;
-        return instance;
+        return _setIntValue(instance, index, Float.floatToRawIntBits(value));
     }
 
     //////////////////////////////////////////////////////////////////////////
@@ -512,9 +531,12 @@ public class DoubleFixedBooleanGenericObjectAccessor implements
      * @see IGenericObjectAccessor#getLongValue(Object, int)
      */
     public static long _getLongValue(final Object[] instance, final int index) {
-        checkNonBooleanIndex(index);
-        return Double.doubleToRawLongBits(getPrimitiveArray(instance)[index
-                + START_INDEX]);
+        checkPrimitiveIndex(index);
+        checkPrimitiveIndex(index + 1);
+        final int[] array = getPrimitiveArray(instance);
+        final int low = array[index + PRIMITIVE_START_INDEX];
+        final int high = array[index + PRIMITIVE_START_INDEX + 1];
+        return ((long) high << 32) | (low & 0xFFFFFFFFL);
     }
 
     /**
@@ -522,9 +544,13 @@ public class DoubleFixedBooleanGenericObjectAccessor implements
      */
     public static Object[] _setLongValue(final Object[] instance,
             final int index, final long value) {
-        checkNonBooleanIndex(index);
-        getPrimitiveArray(instance)[index + START_INDEX] = Double
-                .longBitsToDouble(value);
+        checkPrimitiveIndex(index);
+        checkPrimitiveIndex(index + 1);
+        final int[] array = getPrimitiveArray(instance);
+        final int low = (int) value;
+        final int high = (int) (value >> 32);
+        array[index + PRIMITIVE_START_INDEX] = low;
+        array[index + PRIMITIVE_START_INDEX + 1] = high;
         return instance;
     }
 
@@ -535,8 +561,7 @@ public class DoubleFixedBooleanGenericObjectAccessor implements
      */
     public static double _getDoubleValue(final Object[] instance,
             final int index) {
-        checkNonBooleanIndex(index);
-        return getPrimitiveArray(instance)[index + START_INDEX];
+        return Double.longBitsToDouble(_getLongValue(instance, index));
     }
 
     /**
@@ -544,9 +569,7 @@ public class DoubleFixedBooleanGenericObjectAccessor implements
      */
     public static Object[] _setDoubleValue(final Object[] instance,
             final int index, final double value) {
-        checkNonBooleanIndex(index);
-        getPrimitiveArray(instance)[index + START_INDEX] = value;
-        return instance;
+        return _setLongValue(instance, index, Double.doubleToRawLongBits(value));
     }
 
     //////////////////////////////////////////////////////////////////////////
@@ -556,8 +579,8 @@ public class DoubleFixedBooleanGenericObjectAccessor implements
      */
     public static Object _getObjectValue(final Object[] instance,
             final int index) {
-        checkNonBooleanIndex(index);
-        return instance[index + START_INDEX];
+        checkObjectIndex(index);
+        return instance[index + OBJECT_START_INDEX];
     }
 
     /**
@@ -565,8 +588,8 @@ public class DoubleFixedBooleanGenericObjectAccessor implements
      */
     public static Object[] _setObjectValue(final Object[] instance,
             final int index, final Object value) {
-        checkNonBooleanIndex(index);
-        instance[index + START_INDEX] = value;
+        checkObjectIndex(index);
+        instance[index + OBJECT_START_INDEX] = value;
         return instance;
     }
 

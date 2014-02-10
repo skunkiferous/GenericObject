@@ -199,4 +199,14 @@ public interface IGenericObject<STORAGE> {
      */
     public GenericObject<STORAGE> setDoubleValue(int index, double value);
 
+    /**
+     * @see IGenericObjectAccessor#getObjectValue(Object, int, double)
+     */
+    public Object getObjectValue(int index);
+
+    /**
+     * @see IGenericObjectAccessor#setObjectValue(Object, int, double)
+     */
+    public GenericObject<STORAGE> setObjectValue(int index, Object value);
+
 }

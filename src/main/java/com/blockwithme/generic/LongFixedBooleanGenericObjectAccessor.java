@@ -262,7 +262,7 @@ public class LongFixedBooleanGenericObjectAccessor implements
      * @see IGenericObjectAccessor#getPrimitiveValuesMaximumIndex(Object)
      */
     public static int _getPrimitiveValuesMaximumIndex(final Object[] instance) {
-        return ((long[]) instance[0]).length - (1 + START_INDEX);
+        return getPrimitiveArray(instance).length - (1 + START_INDEX);
     }
 
     /**
@@ -286,7 +286,7 @@ public class LongFixedBooleanGenericObjectAccessor implements
      * @see IGenericObjectAccessor#getPrimitiveValuesSlotsAvailable(Object)
      */
     public static int _getPrimitiveValuesSlotsAvailable(final Object[] instance) {
-        return ((long[]) instance[0]).length - START_INDEX;
+        return getPrimitiveArray(instance).length - START_INDEX;
     }
 
     /**
@@ -340,7 +340,7 @@ public class LongFixedBooleanGenericObjectAccessor implements
      */
     public static Object[] _resizePrimitiveValues(final Object[] instance,
             final int reservedSize) {
-        final long[] oldData = (long[]) instance[0];
+        final long[] oldData = getPrimitiveArray(instance);
         final int oldSize = oldData.length;
         final int newSize = newSize(reservedSize, "reservedSize");
         if (oldSize < newSize) {
@@ -410,7 +410,7 @@ public class LongFixedBooleanGenericObjectAccessor implements
      */
     public static byte _getByteValue(final Object[] instance, final int index) {
         checkNonBooleanIndex(index);
-        return (byte) getPrimitiveArray(instance)[index + 1];
+        return (byte) getPrimitiveArray(instance)[index + START_INDEX];
     }
 
     /**
@@ -419,7 +419,7 @@ public class LongFixedBooleanGenericObjectAccessor implements
     public static Object[] _setByteValue(final Object[] instance,
             final int index, final byte value) {
         checkNonBooleanIndex(index);
-        getPrimitiveArray(instance)[index + 1] = value;
+        getPrimitiveArray(instance)[index + START_INDEX] = value;
         return instance;
     }
 
@@ -430,7 +430,7 @@ public class LongFixedBooleanGenericObjectAccessor implements
      */
     public static char _getCharValue(final Object[] instance, final int index) {
         checkNonBooleanIndex(index);
-        return (char) getPrimitiveArray(instance)[index + 1];
+        return (char) getPrimitiveArray(instance)[index + START_INDEX];
     }
 
     /**
@@ -439,7 +439,7 @@ public class LongFixedBooleanGenericObjectAccessor implements
     public static Object[] _setCharValue(final Object[] instance,
             final int index, final char value) {
         checkNonBooleanIndex(index);
-        getPrimitiveArray(instance)[index + 1] = value;
+        getPrimitiveArray(instance)[index + START_INDEX] = value;
         return instance;
     }
 
@@ -450,7 +450,7 @@ public class LongFixedBooleanGenericObjectAccessor implements
      */
     public static short _getShortValue(final Object[] instance, final int index) {
         checkNonBooleanIndex(index);
-        return (short) getPrimitiveArray(instance)[index + 1];
+        return (short) getPrimitiveArray(instance)[index + START_INDEX];
     }
 
     /**
@@ -459,7 +459,7 @@ public class LongFixedBooleanGenericObjectAccessor implements
     public static Object[] _setShortValue(final Object[] instance,
             final int index, final short value) {
         checkNonBooleanIndex(index);
-        getPrimitiveArray(instance)[index + 1] = value;
+        getPrimitiveArray(instance)[index + START_INDEX] = value;
         return instance;
     }
 
@@ -470,7 +470,7 @@ public class LongFixedBooleanGenericObjectAccessor implements
      */
     public static int _getIntValue(final Object[] instance, final int index) {
         checkNonBooleanIndex(index);
-        return (int) getPrimitiveArray(instance)[index + 1];
+        return (int) getPrimitiveArray(instance)[index + START_INDEX];
     }
 
     /**
@@ -479,7 +479,7 @@ public class LongFixedBooleanGenericObjectAccessor implements
     public static Object[] _setIntValue(final Object[] instance,
             final int index, final int value) {
         checkNonBooleanIndex(index);
-        getPrimitiveArray(instance)[index + 1] = value;
+        getPrimitiveArray(instance)[index + START_INDEX] = value;
         return instance;
     }
 
@@ -507,7 +507,7 @@ public class LongFixedBooleanGenericObjectAccessor implements
      */
     public static long _getLongValue(final Object[] instance, final int index) {
         checkNonBooleanIndex(index);
-        return ((long[]) instance[0])[index + 1];
+        return getPrimitiveArray(instance)[index + START_INDEX];
     }
 
     /**
@@ -516,7 +516,7 @@ public class LongFixedBooleanGenericObjectAccessor implements
     public static Object[] _setLongValue(final Object[] instance,
             final int index, final long value) {
         checkNonBooleanIndex(index);
-        ((long[]) instance[0])[index + 1] = value;
+        getPrimitiveArray(instance)[index + START_INDEX] = value;
         return instance;
     }
 
@@ -536,6 +536,27 @@ public class LongFixedBooleanGenericObjectAccessor implements
     public static Object[] _setDoubleValue(final Object[] instance,
             final int index, final double value) {
         return _setLongValue(instance, index, Double.doubleToRawLongBits(value));
+    }
+
+    //////////////////////////////////////////////////////////////////////////
+
+    /**
+     * @see IGenericObjectAccessor#getObjectValue(Object, int)
+     */
+    public static Object _getObjectValue(final Object[] instance,
+            final int index) {
+        checkNonBooleanIndex(index);
+        return instance[index + START_INDEX];
+    }
+
+    /**
+     * @see IGenericObjectAccessor#setObjectValue(Object, int, Object)
+     */
+    public static Object[] _setObjectValue(final Object[] instance,
+            final int index, final Object value) {
+        checkNonBooleanIndex(index);
+        instance[index + START_INDEX] = value;
+        return instance;
     }
 
     //////////////////////////////////////////////////////////////////////////
@@ -978,5 +999,24 @@ public class LongFixedBooleanGenericObjectAccessor implements
     public final Object[] setDoubleValue(final Object[] instance,
             final int index, final double value) {
         return _setDoubleValue(instance, index, value);
+    }
+
+    //////////////////////////////////////////////////////////////////////////
+
+    /**
+     * @see IGenericObjectAccessor#getObjectValue(Object, int)
+     */
+    @Override
+    public final Object getObjectValue(final Object[] instance, final int index) {
+        return _getObjectValue(instance, index);
+    }
+
+    /**
+     * @see IGenericObjectAccessor#setObjectValue(Object, int, Object)
+     */
+    @Override
+    public final Object[] setObjectValue(final Object[] instance,
+            final int index, final Object value) {
+        return _setObjectValue(instance, index, value);
     }
 }

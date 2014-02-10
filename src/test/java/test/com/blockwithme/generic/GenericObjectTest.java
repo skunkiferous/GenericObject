@@ -30,6 +30,8 @@ import com.blockwithme.generic.LongFixedBooleanGenericObjectAccessor;
 /**
  * Tests of GenericObject.
  *
+ * TODO Add test for GenericObject-specific methods
+ *
  * @author monster
  */
 public class GenericObjectTest {
@@ -322,6 +324,30 @@ public class GenericObjectTest {
             for (int i = startIncl; i <= endIncl; i++) {
                 assertEquals("DoubleValue[" + i + "]", values[i],
                         instance.getDoubleValue(i), 0.0001);
+            }
+        }
+    }
+
+    @Test
+    public void testObjectValue() {
+        final IGenericObject<Object[]> instance = newInstance();
+        final int startIncl = accessor.getObjectValuesStartIndex();
+        final int endIncl = instance.getObjectValuesMaximumIndex();
+
+        for (int i = startIncl; i <= endIncl; i++) {
+            assertEquals("ObjectValue[" + i + "]", null,
+                    instance.getObjectValue(i));
+        }
+
+        final Object[] values = new Object[endIncl + 1];
+        for (int loop = 0; loop < 10; loop++) {
+            for (int i = startIncl; i <= endIncl; i++) {
+                values[i] = String.valueOf(random.nextInt());
+                instance.setObjectValue(i, values[i]);
+            }
+            for (int i = startIncl; i <= endIncl; i++) {
+                assertEquals("ObjectValue[" + i + "]", values[i],
+                        instance.getObjectValue(i));
             }
         }
     }

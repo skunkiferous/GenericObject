@@ -159,9 +159,20 @@ public abstract class AbstractGenericObjectAccessorTest<STORAGE> {
 
     @Test
     public void testIsOptimalPackingUsedForBooleanValues() {
-        assertEquals("IsOptimalPackingUsedForBooleanValues",
-                expectedIsOptimalPackingUsedForBooleanValues, getAccessor()
-                        .isOptimalPackingUsedForBooleanValues());
+        if (expectedIsBooleanValuesIDSpaceIndependentFromPrimitive) {
+            assertEquals("IsOptimalPackingUsedForBooleanValues",
+                    expectedIsOptimalPackingUsedForBooleanValues, getAccessor()
+                            .isOptimalPackingUsedForBooleanValues());
+        } else {
+            // Must fail!
+            boolean failed = false;
+            try {
+                getAccessor().isOptimalPackingUsedForBooleanValues();
+            } catch (final RuntimeException e) {
+                failed = true;
+            }
+            assertTrue("IsOptimalPackingUsedForBooleanValues", failed);
+        }
     }
 
     @Test
@@ -180,9 +191,20 @@ public abstract class AbstractGenericObjectAccessorTest<STORAGE> {
 
     @Test
     public void testGetBooleanValuesStartIndex() {
-        assertEquals("GetBooleanValuesStartIndex",
-                expectedGetBooleanValuesStartIndex, getAccessor()
-                        .getBooleanValuesStartIndex());
+        if (expectedIsBooleanValuesIDSpaceIndependentFromPrimitive) {
+            assertEquals("GetBooleanValuesStartIndex",
+                    expectedGetBooleanValuesStartIndex, getAccessor()
+                            .getBooleanValuesStartIndex());
+        } else {
+            // Must fail!
+            boolean failed = false;
+            try {
+                getAccessor().getBooleanValuesStartIndex();
+            } catch (final RuntimeException e) {
+                failed = true;
+            }
+            assertTrue("GetBooleanValuesStartIndex", failed);
+        }
     }
 
     @Test
@@ -201,9 +223,20 @@ public abstract class AbstractGenericObjectAccessorTest<STORAGE> {
 
     @Test
     public void testGetBooleanValuesMaximumCount() {
-        assertEquals("GetBooleanValuesMaximumCount",
-                expectedGetBooleanValuesMaximumCount, getAccessor()
-                        .getBooleanValuesMaximumCount());
+        if (expectedIsBooleanValuesIDSpaceIndependentFromPrimitive) {
+            assertEquals("GetBooleanValuesMaximumCount",
+                    expectedGetBooleanValuesMaximumCount, getAccessor()
+                            .getBooleanValuesMaximumCount());
+        } else {
+            // Must fail!
+            boolean failed = false;
+            try {
+                getAccessor().getBooleanValuesMaximumCount();
+            } catch (final RuntimeException e) {
+                failed = true;
+            }
+            assertTrue("GetBooleanValuesMaximumCount", failed);
+        }
     }
 
     @Test
@@ -223,10 +256,21 @@ public abstract class AbstractGenericObjectAccessorTest<STORAGE> {
 
     @Test
     public void testGetBooleanValuesMaximumIndex() {
-        final STORAGE instance = newInstance();
-        assertEquals("GetBooleanValuesMaximumIndex",
-                expectedGetBooleanValuesMaximumIndex(), getAccessor()
-                        .getBooleanValuesMaximumIndex(instance));
+        if (expectedIsBooleanValuesIDSpaceIndependentFromPrimitive) {
+            final STORAGE instance = newInstance();
+            assertEquals("GetBooleanValuesMaximumIndex",
+                    expectedGetBooleanValuesMaximumIndex(), getAccessor()
+                            .getBooleanValuesMaximumIndex(instance));
+        } else {
+            // Must fail!
+            boolean failed = false;
+            try {
+                getAccessor().getBooleanValuesMaximumIndex(newInstance());
+            } catch (final RuntimeException e) {
+                failed = true;
+            }
+            assertTrue("GetBooleanValuesMaximumIndex", failed);
+        }
     }
 
     @Test
@@ -247,10 +291,21 @@ public abstract class AbstractGenericObjectAccessorTest<STORAGE> {
 
     @Test
     public void testGetBooleanValuesSlotsAvailable() {
-        final STORAGE instance = newInstance();
-        assertEquals("GetBooleanValuesSlotsAvailable",
-                expectedGetBooleanValuesSlotsAvailable, getAccessor()
-                        .getBooleanValuesSlotsAvailable(instance));
+        if (expectedIsBooleanValuesIDSpaceIndependentFromPrimitive) {
+            final STORAGE instance = newInstance();
+            assertEquals("GetBooleanValuesSlotsAvailable",
+                    expectedGetBooleanValuesSlotsAvailable, getAccessor()
+                            .getBooleanValuesSlotsAvailable(instance));
+        } else {
+            // Must fail!
+            boolean failed = false;
+            try {
+                getAccessor().getBooleanValuesSlotsAvailable(newInstance());
+            } catch (final RuntimeException e) {
+                failed = true;
+            }
+            assertTrue("GetBooleanValuesSlotsAvailable", failed);
+        }
     }
 
     @Test
@@ -321,9 +376,15 @@ public abstract class AbstractGenericObjectAccessorTest<STORAGE> {
     @Test
     public void testBooleanValue() {
         final STORAGE instance = newInstance();
-        final int startIncl = getAccessor().getBooleanValuesStartIndex();
-        final int endIncl = getAccessor()
-                .getBooleanValuesMaximumIndex(instance);
+        final int startIncl;
+        final int endIncl;
+        if (expectedIsBooleanValuesIDSpaceIndependentFromPrimitive) {
+            startIncl = getAccessor().getBooleanValuesStartIndex();
+            endIncl = getAccessor().getBooleanValuesMaximumIndex(instance);
+        } else {
+            startIncl = getAccessor().getPrimitiveValuesStartIndex();
+            endIncl = getAccessor().getPrimitiveValuesMaximumIndex(instance);
+        }
 
         for (int i = startIncl; i <= endIncl; i++) {
             assertEquals("BooleanValue[" + i + "]", false, getAccessor()
@@ -475,22 +536,22 @@ public abstract class AbstractGenericObjectAccessorTest<STORAGE> {
         final int endIncl = getAccessor().getPrimitiveValuesMaximumIndex(
                 instance);
 
-        for (int i = startIncl; i <= endIncl; i++) {
+        int inc = 1;
+        if (getAccessor().isLongUsingTwoPrimitiveSlots()) {
+            inc = 2;
+        }
+        for (int i = startIncl; i <= endIncl; i += inc) {
             assertEquals("LongValue[" + i + "]", 0L, getAccessor()
                     .getLongValue(instance, i));
         }
 
         final long[] values = new long[endIncl + 1];
-        int inc = 1;
-        if (getAccessor().isLongUsingTwoPrimitiveSlots()) {
-            inc = 2;
-        }
         for (int loop = 0; loop < 10; loop++) {
             for (int i = startIncl; i <= endIncl; i += inc) {
                 values[i] = random.nextLong();
                 getAccessor().setLongValue(instance, i, values[i]);
             }
-            for (int i = startIncl; i <= endIncl; i++) {
+            for (int i = startIncl; i <= endIncl; i += inc) {
                 assertEquals("LongValue[" + i + "]", values[i], getAccessor()
                         .getLongValue(instance, i));
             }
@@ -504,24 +565,48 @@ public abstract class AbstractGenericObjectAccessorTest<STORAGE> {
         final int endIncl = getAccessor().getPrimitiveValuesMaximumIndex(
                 instance);
 
-        for (int i = startIncl; i <= endIncl; i++) {
+        int inc = 1;
+        if (getAccessor().isDoubleUsingTwoPrimitiveSlots()) {
+            inc = 2;
+        }
+        for (int i = startIncl; i <= endIncl; i += inc) {
             assertEquals("DoubleValue[" + i + "]", 0.0, getAccessor()
                     .getDoubleValue(instance, i), 0.0001);
         }
 
         final double[] values = new double[endIncl + 1];
-        int inc = 1;
-        if (getAccessor().isDoubleUsingTwoPrimitiveSlots()) {
-            inc = 2;
-        }
         for (int loop = 0; loop < 10; loop++) {
             for (int i = startIncl; i <= endIncl; i += inc) {
                 values[i] = Double.longBitsToDouble(random.nextLong());
                 getAccessor().setDoubleValue(instance, i, values[i]);
             }
-            for (int i = startIncl; i <= endIncl; i++) {
+            for (int i = startIncl; i <= endIncl; i += inc) {
                 assertEquals("DoubleValue[" + i + "]", values[i], getAccessor()
                         .getDoubleValue(instance, i), 0.0001);
+            }
+        }
+    }
+
+    @Test
+    public void testObjectValue() {
+        final STORAGE instance = newInstance();
+        final int startIncl = getAccessor().getObjectValuesStartIndex();
+        final int endIncl = getAccessor().getObjectValuesMaximumIndex(instance);
+
+        for (int i = startIncl; i <= endIncl; i++) {
+            assertEquals("ObjectValue[" + i + "]", null, getAccessor()
+                    .getObjectValue(instance, i));
+        }
+
+        final Object[] values = new Object[endIncl + 1];
+        for (int loop = 0; loop < 10; loop++) {
+            for (int i = startIncl; i <= endIncl; i++) {
+                values[i] = String.valueOf(random.nextInt());
+                getAccessor().setObjectValue(instance, i, values[i]);
+            }
+            for (int i = startIncl; i <= endIncl; i++) {
+                assertEquals("ObjectValue[" + i + "]", values[i], getAccessor()
+                        .getObjectValue(instance, i));
             }
         }
     }

@@ -405,4 +405,24 @@ public class GenericObject<STORAGE> implements IGenericObject<STORAGE> {
         instance = accessor.setDoubleValue(instance, index, value);
         return this;
     }
+
+    //////////////////////////////////////////////////////////////////////////
+
+    /* (non-Javadoc)
+     * @see IGenericObject#getObjectValue(int)
+     */
+    @Override
+    public final Object getObjectValue(final int index) {
+        return accessor.getObjectValue(instance, index);
+    }
+
+    /* (non-Javadoc)
+     * @see IGenericObject#setObjectValue(int, Object)
+     */
+    @Override
+    public final GenericObject<STORAGE> setObjectValue(final int index,
+            final Object value) {
+        instance = accessor.setObjectValue(instance, index, value);
+        return this;
+    }
 }

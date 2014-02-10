@@ -200,12 +200,12 @@ public interface IGenericObject<STORAGE> {
     public GenericObject<STORAGE> setDoubleValue(int index, double value);
 
     /**
-     * @see IGenericObjectAccessor#getObjectValue(Object, int, double)
+     * @see IGenericObjectAccessor#getObjectValue(Object, int)
      */
     public Object getObjectValue(int index);
 
     /**
-     * @see IGenericObjectAccessor#setObjectValue(Object, int, double)
+     * @see IGenericObjectAccessor#setObjectValue(Object, int, Object)
      */
     public GenericObject<STORAGE> setObjectValue(int index, Object value);
 

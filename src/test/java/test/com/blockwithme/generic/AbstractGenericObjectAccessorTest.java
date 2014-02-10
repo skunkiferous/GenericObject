@@ -18,6 +18,9 @@ package test.com.blockwithme.generic;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+import java.util.Random;
 
 import org.junit.Test;
 
@@ -31,6 +34,8 @@ import com.blockwithme.generic.IGenericObjectAccessor;
  * @author monster
  */
 public abstract class AbstractGenericObjectAccessorTest<STORAGE> {
+    protected final Random random = new Random();
+
     protected boolean expectedIsBooleanValuesIDSpaceIndependentFromPrimitive = true;
 
     protected boolean expectedIsBooleanValuesIDSpaceFixed = true;
@@ -42,6 +47,10 @@ public abstract class AbstractGenericObjectAccessorTest<STORAGE> {
     protected boolean expectedIsImmutableInstancesUsed = false;
 
     protected boolean expectedIsThreadSafeInstancesUsed = false;
+
+    protected boolean expectedIsLongUsingTwoPrimitiveSlots = false;
+
+    protected boolean expectedIsDoubleUsingTwoPrimitiveSlots = false;
 
     protected boolean expectedIsOptimalPackingUsedForPrimitiveValues = false;
 
@@ -125,6 +134,20 @@ public abstract class AbstractGenericObjectAccessorTest<STORAGE> {
         assertEquals("IsThreadSafeInstancesUsed",
                 expectedIsThreadSafeInstancesUsed, getAccessor()
                         .isThreadSafeInstancesUsed());
+    }
+
+    @Test
+    public void testIsLongUsingTwoPrimitiveSlots() {
+        assertEquals("IsLongUsingTwoPrimitiveSlots",
+                expectedIsLongUsingTwoPrimitiveSlots, getAccessor()
+                        .isLongUsingTwoPrimitiveSlots());
+    }
+
+    @Test
+    public void testIsDoubleUsingTwoPrimitiveSlots() {
+        assertEquals("IsDoubleUsingTwoPrimitiveSlots",
+                expectedIsDoubleUsingTwoPrimitiveSlots, getAccessor()
+                        .isDoubleUsingTwoPrimitiveSlots());
     }
 
     @Test
@@ -298,17 +321,25 @@ public abstract class AbstractGenericObjectAccessorTest<STORAGE> {
     @Test
     public void testBooleanValue() {
         final STORAGE instance = newInstance();
-        final int startIncl = getAccessor().getPrimitiveValuesStartIndex();
-        final int endIncl = getAccessor().getPrimitiveValuesMaximumIndex(
-                instance);
-        boolean value = true;
+        final int startIncl = getAccessor().getBooleanValuesStartIndex();
+        final int endIncl = getAccessor()
+                .getBooleanValuesMaximumIndex(instance);
+
         for (int i = startIncl; i <= endIncl; i++) {
             assertEquals("BooleanValue[" + i + "]", false, getAccessor()
                     .getBooleanValue(instance, i));
-            getAccessor().setBooleanValue(instance, i, value);
-            assertEquals("BooleanValue[" + i + "]", value, getAccessor()
-                    .getBooleanValue(instance, i));
-            value = !value;
+        }
+
+        final boolean[] values = new boolean[endIncl + 1];
+        for (int loop = 0; loop < 10; loop++) {
+            for (int i = startIncl; i <= endIncl; i++) {
+                values[i] = random.nextBoolean();
+                getAccessor().setBooleanValue(instance, i, values[i]);
+            }
+            for (int i = startIncl; i <= endIncl; i++) {
+                assertEquals("BooleanValue[" + i + "]", values[i],
+                        getAccessor().getBooleanValue(instance, i));
+            }
         }
     }
 
@@ -318,14 +349,22 @@ public abstract class AbstractGenericObjectAccessorTest<STORAGE> {
         final int startIncl = getAccessor().getPrimitiveValuesStartIndex();
         final int endIncl = getAccessor().getPrimitiveValuesMaximumIndex(
                 instance);
-        byte value = 42;
+
         for (int i = startIncl; i <= endIncl; i++) {
-            assertEquals("ByteValue[" + i + "]", 0,
-                    getAccessor().getByteValue(instance, i));
-            getAccessor().setByteValue(instance, i, value);
-            assertEquals("ByteValue[" + i + "]", value, getAccessor()
+            assertEquals("ByteValue[" + i + "]", (byte) 0, getAccessor()
                     .getByteValue(instance, i));
-            value++;
+        }
+
+        final byte[] values = new byte[endIncl + 1];
+        for (int loop = 0; loop < 10; loop++) {
+            for (int i = startIncl; i <= endIncl; i++) {
+                values[i] = (byte) random.nextInt();
+                getAccessor().setByteValue(instance, i, values[i]);
+            }
+            for (int i = startIncl; i <= endIncl; i++) {
+                assertEquals("ByteValue[" + i + "]", values[i], getAccessor()
+                        .getByteValue(instance, i));
+            }
         }
     }
 
@@ -335,14 +374,22 @@ public abstract class AbstractGenericObjectAccessorTest<STORAGE> {
         final int startIncl = getAccessor().getPrimitiveValuesStartIndex();
         final int endIncl = getAccessor().getPrimitiveValuesMaximumIndex(
                 instance);
-        char value = 42;
+
         for (int i = startIncl; i <= endIncl; i++) {
-            assertEquals("CharValue[" + i + "]", 0,
-                    getAccessor().getCharValue(instance, i));
-            getAccessor().setCharValue(instance, i, value);
-            assertEquals("CharValue[" + i + "]", value, getAccessor()
+            assertEquals("CharValue[" + i + "]", (char) 0, getAccessor()
                     .getCharValue(instance, i));
-            value++;
+        }
+
+        final char[] values = new char[endIncl + 1];
+        for (int loop = 0; loop < 10; loop++) {
+            for (int i = startIncl; i <= endIncl; i++) {
+                values[i] = (char) random.nextInt();
+                getAccessor().setCharValue(instance, i, values[i]);
+            }
+            for (int i = startIncl; i <= endIncl; i++) {
+                assertEquals("CharValue[" + i + "]", values[i], getAccessor()
+                        .getCharValue(instance, i));
+            }
         }
     }
 
@@ -352,14 +399,22 @@ public abstract class AbstractGenericObjectAccessorTest<STORAGE> {
         final int startIncl = getAccessor().getPrimitiveValuesStartIndex();
         final int endIncl = getAccessor().getPrimitiveValuesMaximumIndex(
                 instance);
-        short value = 42;
+
         for (int i = startIncl; i <= endIncl; i++) {
-            assertEquals("ShortValue[" + i + "]", 0, getAccessor()
+            assertEquals("ShortValue[" + i + "]", (short) 0, getAccessor()
                     .getShortValue(instance, i));
-            getAccessor().setShortValue(instance, i, value);
-            assertEquals("ShortValue[" + i + "]", value, getAccessor()
-                    .getShortValue(instance, i));
-            value++;
+        }
+
+        final short[] values = new short[endIncl + 1];
+        for (int loop = 0; loop < 10; loop++) {
+            for (int i = startIncl; i <= endIncl; i++) {
+                values[i] = (short) random.nextInt();
+                getAccessor().setShortValue(instance, i, values[i]);
+            }
+            for (int i = startIncl; i <= endIncl; i++) {
+                assertEquals("ShortValue[" + i + "]", values[i], getAccessor()
+                        .getShortValue(instance, i));
+            }
         }
     }
 
@@ -369,14 +424,22 @@ public abstract class AbstractGenericObjectAccessorTest<STORAGE> {
         final int startIncl = getAccessor().getPrimitiveValuesStartIndex();
         final int endIncl = getAccessor().getPrimitiveValuesMaximumIndex(
                 instance);
-        int value = 42;
+
         for (int i = startIncl; i <= endIncl; i++) {
             assertEquals("IntValue[" + i + "]", 0,
                     getAccessor().getIntValue(instance, i));
-            getAccessor().setIntValue(instance, i, value);
-            assertEquals("IntValue[" + i + "]", value, getAccessor()
-                    .getIntValue(instance, i));
-            value++;
+        }
+
+        final int[] values = new int[endIncl + 1];
+        for (int loop = 0; loop < 10; loop++) {
+            for (int i = startIncl; i <= endIncl; i++) {
+                values[i] = random.nextInt();
+                getAccessor().setIntValue(instance, i, values[i]);
+            }
+            for (int i = startIncl; i <= endIncl; i++) {
+                assertEquals("IntValue[" + i + "]", values[i], getAccessor()
+                        .getIntValue(instance, i));
+            }
         }
     }
 
@@ -386,14 +449,22 @@ public abstract class AbstractGenericObjectAccessorTest<STORAGE> {
         final int startIncl = getAccessor().getPrimitiveValuesStartIndex();
         final int endIncl = getAccessor().getPrimitiveValuesMaximumIndex(
                 instance);
-        float value = 42;
+
         for (int i = startIncl; i <= endIncl; i++) {
-            assertEquals("FloatValue[" + i + "]", 0, getAccessor()
+            assertEquals("FloatValue[" + i + "]", 0.0f, getAccessor()
                     .getFloatValue(instance, i), 0.0001f);
-            getAccessor().setFloatValue(instance, i, value);
-            assertEquals("FloatValue[" + i + "]", value, getAccessor()
-                    .getFloatValue(instance, i), 0.0001f);
-            value++;
+        }
+
+        final float[] values = new float[endIncl + 1];
+        for (int loop = 0; loop < 10; loop++) {
+            for (int i = startIncl; i <= endIncl; i++) {
+                values[i] = Float.intBitsToFloat(random.nextInt());
+                getAccessor().setFloatValue(instance, i, values[i]);
+            }
+            for (int i = startIncl; i <= endIncl; i++) {
+                assertEquals("FloatValue[" + i + "]", values[i], getAccessor()
+                        .getFloatValue(instance, i), 0.0001f);
+            }
         }
     }
 
@@ -403,14 +474,26 @@ public abstract class AbstractGenericObjectAccessorTest<STORAGE> {
         final int startIncl = getAccessor().getPrimitiveValuesStartIndex();
         final int endIncl = getAccessor().getPrimitiveValuesMaximumIndex(
                 instance);
-        long value = 42;
+
         for (int i = startIncl; i <= endIncl; i++) {
-            assertEquals("LongValue[" + i + "]", 0,
-                    getAccessor().getLongValue(instance, i));
-            getAccessor().setLongValue(instance, i, value);
-            assertEquals("LongValue[" + i + "]", value, getAccessor()
+            assertEquals("LongValue[" + i + "]", 0L, getAccessor()
                     .getLongValue(instance, i));
-            value++;
+        }
+
+        final long[] values = new long[endIncl + 1];
+        int inc = 1;
+        if (getAccessor().isLongUsingTwoPrimitiveSlots()) {
+            inc = 2;
+        }
+        for (int loop = 0; loop < 10; loop++) {
+            for (int i = startIncl; i <= endIncl; i += inc) {
+                values[i] = random.nextLong();
+                getAccessor().setLongValue(instance, i, values[i]);
+            }
+            for (int i = startIncl; i <= endIncl; i++) {
+                assertEquals("LongValue[" + i + "]", values[i], getAccessor()
+                        .getLongValue(instance, i));
+            }
         }
     }
 
@@ -420,14 +503,26 @@ public abstract class AbstractGenericObjectAccessorTest<STORAGE> {
         final int startIncl = getAccessor().getPrimitiveValuesStartIndex();
         final int endIncl = getAccessor().getPrimitiveValuesMaximumIndex(
                 instance);
-        double value = 42;
+
         for (int i = startIncl; i <= endIncl; i++) {
-            assertEquals("DoubleValue[" + i + "]", 0, getAccessor()
+            assertEquals("DoubleValue[" + i + "]", 0.0, getAccessor()
                     .getDoubleValue(instance, i), 0.0001);
-            getAccessor().setDoubleValue(instance, i, value);
-            assertEquals("DoubleValue[" + i + "]", value, getAccessor()
-                    .getDoubleValue(instance, i), 0.0001);
-            value++;
+        }
+
+        final double[] values = new double[endIncl + 1];
+        int inc = 1;
+        if (getAccessor().isDoubleUsingTwoPrimitiveSlots()) {
+            inc = 2;
+        }
+        for (int loop = 0; loop < 10; loop++) {
+            for (int i = startIncl; i <= endIncl; i += inc) {
+                values[i] = Double.longBitsToDouble(random.nextLong());
+                getAccessor().setDoubleValue(instance, i, values[i]);
+            }
+            for (int i = startIncl; i <= endIncl; i++) {
+                assertEquals("DoubleValue[" + i + "]", values[i], getAccessor()
+                        .getDoubleValue(instance, i), 0.0001);
+            }
         }
     }
 
@@ -556,9 +651,14 @@ public abstract class AbstractGenericObjectAccessorTest<STORAGE> {
      * a size of 0.
      */
     protected STORAGE newInstance() {
-        return getAccessor().newEmptyGenericObject();
+        final IGenericObjectAccessor<STORAGE> a = getAccessor();
+        assertNotNull(getClass().getName() + ".getAccessor()", a);
+        return a.newEmptyGenericObject();
     }
 
     /** Must be implemented in subclass. */
-    protected abstract IGenericObjectAccessor<STORAGE> getAccessor();
+    protected IGenericObjectAccessor<STORAGE> getAccessor() {
+        fail("getAccessor() mut be overwritten!");
+        return null;
+    }
 }

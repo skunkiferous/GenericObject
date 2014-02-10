@@ -46,7 +46,7 @@ public interface IGenericObject<STORAGE> {
     /**
      * Sets the generic object storage instance.
      *
-     * @param The new generic object storage instance.
+     * @param instance The new generic object storage instance.
      * @return this
      *
      * @throws NullPointerException if instance is null

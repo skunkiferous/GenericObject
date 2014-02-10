@@ -144,9 +144,31 @@ public interface IGenericObjectAccessor<STORAGE> {
      *
      * @return true if the instances of STORAGE are thread-safe.
      *
-     * @see isImmutableInstancesUsed
+     * @see #isImmutableInstancesUsed()
      */
     boolean isThreadSafeInstancesUsed();
+
+    /**
+     * Returns true if long values require *two* primitive slots.
+     *
+     * This would happen if the internal primitive storage was based on 32-bit
+     * values. Even smaller values would result in bad performance and are
+     * therefore not supported.
+     *
+     * @return true if long values require *two* primitive slots.
+     */
+    boolean isLongUsingTwoPrimitiveSlots();
+
+    /**
+     * Returns true if double values require *two* primitive slots.
+     *
+     * This would happen if the internal primitive storage was based on 32-bit
+     * values. Even smaller values would result in bad performance and are
+     * therefore not supported.
+     *
+     * @return true if double values require *two* primitive slots.
+     */
+    boolean isDoubleUsingTwoPrimitiveSlots();
 
     //////////////////////////////////////////////////////////////////////////
 
@@ -167,7 +189,7 @@ public interface IGenericObjectAccessor<STORAGE> {
      *
      * @return True, if this implementation use "optimal packing" for boolean values.
      *
-     * @see isBooleanValuesIDSpaceIndependentFromPrimitive
+     * @see #isBooleanValuesIDSpaceIndependentFromPrimitive()
      */
     boolean isOptimalPackingUsedForBooleanValues()
             throws UnsupportedOperationException;
@@ -198,7 +220,7 @@ public interface IGenericObjectAccessor<STORAGE> {
      * @return The start index for boolean values.
      * @throws UnsupportedOperationException If boolean values do not have their own ID space.
      *
-     * @see isBooleanValuesIDSpaceIndependentFromPrimitive
+     * @see #isBooleanValuesIDSpaceIndependentFromPrimitive()
      */
     int getBooleanValuesStartIndex() throws UnsupportedOperationException;
 
@@ -227,7 +249,7 @@ public interface IGenericObjectAccessor<STORAGE> {
      * @return The maximum number of boolean values.
      * @throws UnsupportedOperationException If boolean values do not have their own ID space.
      *
-     * @see isBooleanValuesIDSpaceIndependentFromPrimitive
+     * @see #isBooleanValuesIDSpaceIndependentFromPrimitive()
      */
     int getBooleanValuesMaximumCount() throws UnsupportedOperationException;
 
@@ -268,8 +290,8 @@ public interface IGenericObjectAccessor<STORAGE> {
      * @throws IllegalArgumentException If the required slots exceed the maximum slot count.
      * @throws UnsupportedOperationException If boolean values do NOT have their own ID space, OR if they use a fixed-size ID space.
      *
-     * @see isBooleanValuesIDSpaceIndependentFromPrimitive
-     * @see getBooleanValuesIDSpaceFixedSize
+     * @see #isBooleanValuesIDSpaceIndependentFromPrimitive()
+     * @see #getBooleanValuesIDSpaceFixedSize()
      */
     STORAGE newGenericObject(int requiredPrimitiveSlots,
             int requiredBooleanSlots, int requiredObjectSlots)
@@ -291,7 +313,7 @@ public interface IGenericObjectAccessor<STORAGE> {
      *
      * @throws IllegalArgumentException If the required slots exceed the maximum slot count.
      *
-     * @see isBooleanValuesIDSpaceIndependentFromPrimitive
+     * @see #isBooleanValuesIDSpaceIndependentFromPrimitive()
      */
     STORAGE newGenericObject(int requiredPrimitiveSlots, int requiredObjectSlots);
 
@@ -325,7 +347,7 @@ public interface IGenericObjectAccessor<STORAGE> {
      * @throws RuntimeException The API is expected to throw *some* RuntimeException if instance is invalid (null, or wrong type)
      * @throws UnsupportedOperationException If boolean values do not have their own ID space.
      *
-     * @see isBooleanValuesIDSpaceIndependentFromPrimitive
+     * @see #isBooleanValuesIDSpaceIndependentFromPrimitive()
      */
     int getBooleanValuesMaximumIndex(STORAGE instance)
             throws UnsupportedOperationException;
@@ -367,7 +389,7 @@ public interface IGenericObjectAccessor<STORAGE> {
      * @throws RuntimeException The API is expected to throw *some* RuntimeException if instance is invalid (null, or wrong type)
      * @throws UnsupportedOperationException If boolean values do not have their own ID space.
      *
-     * @see isBooleanValuesIDSpaceIndependentFromPrimitive
+     * @see #isBooleanValuesIDSpaceIndependentFromPrimitive()
      */
     int getBooleanValuesSlotsAvailable(STORAGE instance)
             throws UnsupportedOperationException;
@@ -397,7 +419,7 @@ public interface IGenericObjectAccessor<STORAGE> {
      * @throws RuntimeException The API is expected to throw *some* RuntimeException if instance is invalid (null, or wrong type)
      * @throws UnsupportedOperationException If isOptimalPackingUsedForPrimitiveValues() returns false.
      *
-     * @see isOptimalPackingUsedForPrimitiveValues
+     * @see #isOptimalPackingUsedForPrimitiveValues()
      */
     int getPrimitiveValuesReservedSize(STORAGE instance)
             throws UnsupportedOperationException;
@@ -419,8 +441,8 @@ public interface IGenericObjectAccessor<STORAGE> {
      * @throws UnsupportedOperationException If boolean values do not have their own ID space.
      * @throws UnsupportedOperationException If isOptimalPackingUsedForBooleanValues() returns false.
      *
-     * @see isBooleanValuesIDSpaceIndependentFromPrimitive
-     * @see isOptimalPackingUsedForBooleanValues
+     * @see #isBooleanValuesIDSpaceIndependentFromPrimitive()
+     * @see #isOptimalPackingUsedForBooleanValues()
      */
     int getBooleanValuesReservedSize(STORAGE instance)
             throws UnsupportedOperationException;
@@ -438,7 +460,7 @@ public interface IGenericObjectAccessor<STORAGE> {
      * @throws RuntimeException The API is expected to throw *some* RuntimeException if instance is invalid (null, or wrong type)
      * @throws UnsupportedOperationException If isOptimalPackingUsedForObjectValues() returns false.
      *
-     * @see isOptimalPackingUsedForObjectValues
+     * @see #isOptimalPackingUsedForObjectValues()
      */
     int getObjectValuesReservedSize(STORAGE instance)
             throws UnsupportedOperationException;
@@ -459,7 +481,7 @@ public interface IGenericObjectAccessor<STORAGE> {
      *
      * @throws RuntimeException The API is expected to throw *some* RuntimeException if instance is invalid (null, or wrong type)
      *
-     * @see isOptimalPackingUsedForPrimitiveValues
+     * @see #isOptimalPackingUsedForPrimitiveValues()
      */
     STORAGE resizePrimitiveValues(STORAGE instance, int reservedSize);
 
@@ -481,8 +503,8 @@ public interface IGenericObjectAccessor<STORAGE> {
      * @throws RuntimeException The API is expected to throw *some* RuntimeException if instance is invalid (null, or wrong type)
      * @throws UnsupportedOperationException If boolean values do not have their own ID space.
      *
-     * @see isBooleanValuesIDSpaceIndependentFromPrimitive
-     * @see isOptimalPackingUsedForBooleanValues
+     * @see #isBooleanValuesIDSpaceIndependentFromPrimitive()
+     * @see #isOptimalPackingUsedForBooleanValues()
      */
     STORAGE resizeBooleanValues(STORAGE instance, int reservedSize)
             throws UnsupportedOperationException;
@@ -501,7 +523,7 @@ public interface IGenericObjectAccessor<STORAGE> {
      *
      * @throws RuntimeException The API is expected to throw *some* RuntimeException if instance is invalid (null, or wrong type)
      *
-     * @see isOptimalPackingUsedForObjectValues
+     * @see #isOptimalPackingUsedForObjectValues()
      */
     STORAGE resizeObjectValues(STORAGE instance, int reservedSize);
 

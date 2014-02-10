@@ -1,5 +1,5 @@
 Manifest-Version: 1.0
-Bnd-LastModified: 1391946078004
+Bnd-LastModified: 1392037216199
 Build-Jdk: 1.7.0_45
 Built-By: monster
 Bundle-Description: *Multiple* different implementations of the generic-
@@ -11,5 +11,6 @@ Bundle-SymbolicName: com.blockwithme.GenericObject
 Bundle-Vendor: Sebastien Diot
 Bundle-Version: 0.0.1
 Created-By: Apache Maven Bundle Plugin
+Export-Package: com.blockwithme.generic;version="0.0.1"
 FuncGenerated012-dependency-version: 1.2.0
 Tool: Bnd-2.1.0.20130426-122213

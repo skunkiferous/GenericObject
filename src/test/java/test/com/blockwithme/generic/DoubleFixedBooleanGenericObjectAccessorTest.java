@@ -15,17 +15,23 @@
  */
 package test.com.blockwithme.generic;
 
+import com.blockwithme.generic.DoubleFixedBooleanGenericObjectAccessor;
 import com.blockwithme.generic.IGenericObjectAccessor;
-import com.blockwithme.generic.LongFixedBooleanGenericObjectAccessor;
 
 /**
  * @author monster
  *
  */
-public class LongFixedBooleanGenericObjectAccessorTest extends
+public class DoubleFixedBooleanGenericObjectAccessorTest extends
         AbstractGenericObjectAccessorTest<Object[]> {
 
-    private static final LongFixedBooleanGenericObjectAccessor accessor = new LongFixedBooleanGenericObjectAccessor();
+    private static final DoubleFixedBooleanGenericObjectAccessor accessor = new DoubleFixedBooleanGenericObjectAccessor();
+
+    public DoubleFixedBooleanGenericObjectAccessorTest() {
+        expectedGetBooleanValuesIDSpaceFixedSize = 52;
+        expectedGetBooleanValuesMaximumCount = 52;
+        expectedGetBooleanValuesSlotsAvailable = 52;
+    }
 
     @Override
     protected IGenericObjectAccessor<Object[]> getAccessor() {

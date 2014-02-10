@@ -27,7 +27,7 @@ import java.util.Objects;
  *
  * @see IGenericObjectAccessor for more information.
  *
- * TODO Test!
+ * TODO Create a type-safe variant of this class (record type on set, and check on get).
  *
  * @author monster
  */

@@ -70,10 +70,18 @@ is currently no plan for a version where both primitives and Objects would
 truly be in a continuous ID space, because I do not know how to achieve this
 efficiently.
 
-Future work:
+Future work / TODO / Issues:
 
  * Add example / tutorial.
  * Add benchmarks
  * Add type-safe GenericObject variant, including toString, hashCode and equals implementations.
  * Estimate shallow memory footprint of generic objects.
  * Add some support for a "unified ID space".
+ * Add "clear" to generic objects.
+ * A long[] could serve as multiple bit-arrays. Use the first long to specify the size of each bit-array (max arrays: 8, max array size: 255).
+ * Move "Converters" to the generic object project
+ * If boolean has it's own ID space, then we are left with only 7 primitive types. We could encode them in 3 bits, when implementing "primitive type validation". The 8th value can be either "undefined", or the least likely type: char.
+ * For bit-arrays, we could call them "channels", and support 1, 2, 4, 8, 16, 24, 32 bits per channel.
+ * We should have a separate class for bit-channels in the generic object project.
+ * Putting the channel configuration in the channel array (as suggested above) would cause move validation and slower speed. But static configurations are problematic. So maybe put the configuration in the interceptor?
+ * If we have bit-channels, we should change get/setBoolean to just use a "normal" primitive slot, and keep the channels separate from "normal" properties. Access to a bit-array could be with get/setBit in stead.

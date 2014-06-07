@@ -40,6 +40,24 @@ public class DoubleFixedBooleanGenericObjectAccessor implements
      */
     private static final int MAX_BOOLEAN_SIZE = 52;
 
+    /** True if we are in the GWT client. */
+    private static final boolean GWT = isGWT();
+
+    /** True if we are in the GWT client. */
+    private static native boolean isGWTJS()
+    /*-{
+        return true;
+    }-*/;
+
+    /** True if we are in the GWT client. */
+    private static boolean isGWT() {
+        try {
+            return isGWTJS();
+        } catch (final Throwable t) {
+            return false;
+        }
+    }
+
     //////////////////////////////////////////////////////////////////////////
 
     /**
@@ -142,7 +160,7 @@ public class DoubleFixedBooleanGenericObjectAccessor implements
      * @see IGenericObjectAccessor#isLongUsingTwoPrimitiveSlots()
      */
     public static boolean _isLongUsingTwoPrimitiveSlots() {
-        return false;
+        return GWT;
     }
 
     /**
@@ -513,6 +531,20 @@ public class DoubleFixedBooleanGenericObjectAccessor implements
      */
     public static long _getLongValue(final Object[] instance, final int index) {
         checkNonBooleanIndex(index);
+        if (GWT) {
+            final double[] array = getPrimitiveArray(instance);
+            final int low = (int) array[index + START_INDEX];
+            final int high = (int) array[index + START_INDEX + 1];
+            return (((long) high) << 32) | (low & 0xFFFFFFFFL);
+        }
+        return _getLongValue2(instance, index);
+    }
+
+    /**
+     * @see IGenericObjectAccessor#getLongValue(Object, int)
+     */
+    @GwtIncompatible
+    private static long _getLongValue2(final Object[] instance, final int index) {
         return Double.doubleToRawLongBits(getPrimitiveArray(instance)[index
                 + START_INDEX]);
     }
@@ -523,6 +555,12 @@ public class DoubleFixedBooleanGenericObjectAccessor implements
     public static Object[] _setLongValue(final Object[] instance,
             final int index, final long value) {
         checkNonBooleanIndex(index);
+        if (GWT) {
+            final double[] array = getPrimitiveArray(instance);
+            array[index + START_INDEX] = (int) (value & 0xFFFFFFFFL);
+            array[index + START_INDEX + 1] = (int) ((value >> 32) & 0xFFFFFFFFL);
+            return instance;
+        }
         getPrimitiveArray(instance)[index + START_INDEX] = Double
                 .longBitsToDouble(value);
         return instance;

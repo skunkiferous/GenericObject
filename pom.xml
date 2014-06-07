@@ -12,7 +12,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.blockwithme</groupId>
 	<artifactId>GenericObject</artifactId>
-	<version>0.0.1</version>
+	<version>0.1.0</version>
 	<packaging>jar</packaging>
 	<inceptionYear>2014</inceptionYear>
 	<name>GenericObject</name>
@@ -48,7 +48,7 @@
 	<parent>
 		<groupId>com.blockwithme</groupId>
 		<artifactId>oss-parent</artifactId>
-		<version>0.0.6</version>
+		<version>0.3.0</version>
 	</parent>
 
 	<build>
@@ -101,6 +101,10 @@
 
 	<repositories>
 		<repository>
+			<id>blockwithme-mvn-repo</id>
+			<url>https://raw.github.com/skunkiferous/Maven/master</url>
+		</repository>
+	    <repository>
 			<id>com.springsource.repository.bundles.release</id>
 			<name>SpringSource Enterprise Bundle Repository - SpringSource Bundle
 			Releases</name>

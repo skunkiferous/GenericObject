@@ -24,6 +24,7 @@ package com.blockwithme.generic;
  *
  * @author monster
  */
+@GwtIncompatible
 public class LongFixedBooleanGenericObjectAccessor implements
         IGenericObjectAccessor<Object[]> {
     /** Initial index (not boolean). */

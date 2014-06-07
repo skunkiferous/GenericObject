@@ -24,6 +24,7 @@ package com.blockwithme.generic;
  *
  * @author monster
  */
+@GwtIncompatible
 public class IntGenericObjectAccessor implements
         IGenericObjectAccessor<Object[]> {
     /** Primitive Initial index. */

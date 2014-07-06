@@ -35,7 +35,7 @@ the long values are somewhat more expensive to access, in terms of speed.
 
 And we also currently have a "long" implementation. It is similar to the
 "double" in that the boolean space is "reserved". It supports 64 booleans, and
-offers good speed for long values, be is somewhat slower for float and double.
+offers good speed for long values, but is somewhat slower for float and double.
 
 Each API defines *exactly the same public static methods*. So you can use them
 in two ways; either directly, by doing a static import of the methods, or
@@ -79,9 +79,9 @@ Future work / TODO / Issues:
  * Add some support for a "unified ID space".
  * Add "clear" to generic objects.
  * A long[] could serve as multiple bit-arrays. Use the first long to specify the size of each bit-array (max arrays: 8, max array size: 255).
- * Move "Converters" to the generic object project
  * If boolean has it's own ID space, then we are left with only 7 primitive types. We could encode them in 3 bits, when implementing "primitive type validation". The 8th value can be either "undefined", or the least likely type: char.
  * For bit-arrays, we could call them "channels", and support 1, 2, 4, 8, 16, 24, 32 bits per channel.
  * We should have a separate class for bit-channels in the generic object project.
  * Putting the channel configuration in the channel array (as suggested above) would cause move validation and slower speed. But static configurations are problematic. So maybe put the configuration in the interceptor?
  * If we have bit-channels, we should change get/setBoolean to just use a "normal" primitive slot, and keep the channels separate from "normal" properties. Access to a bit-array could be with get/setBit in stead.
+ * Create a "sparse" GenericObject implementation
